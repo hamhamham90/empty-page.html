@@ -144,7 +144,7 @@
             });
 
             // ส่งข้อมูลไปยัง Google Sheets ผ่าน Google Apps Script
-            const url = 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL';
+            const url = 'https://script.google.com/macros/s/AKfycbxpGOgcRKncIk0Mf-DIrk_EN7IugWqxqsrQ1A5NZs9bHO5vFPvKAjT8AUP5922i7DcoFQ/exec';
             fetch(url, {
                 method: 'POST',
                 headers: {
