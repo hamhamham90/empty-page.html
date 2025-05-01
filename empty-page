@@ -3,10 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>หน้าเว็ปเปล่า</title>
+    <title>ระบบเช็คชื่อออนไลน์ - สาขาการตลาด</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+        }
+        .status-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
 </head>
-<body class="bg-blue-100 min-h-screen flex justify-center items-center">
-    <h1 class="text-2xl font-bold text-indigo-700">ยินดีต้อนรับสู่หน้าเว็ปเปล่า!</h1>
+<body class="min-h-screen flex justify-center items-center flex-col">
+
+    <header class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-indigo-800">ระบบเช็คชื่อออนไลน์</h1>
+        <p class="text-xl text-indigo-600">สาขาการตลาด แผนกวิชาการตลาด วิทยาลัยพณิชยการบึงพระพิษณุโลก</p>
+        <p class="text-md text-indigo-500">ครูที่ปรึกษา: ครูแฮม</p>
+    </header>
+
+    <!-- วันที่ -->
+    <div class="mb-4">
+        <label class="text-lg text-gray-700">เลือกวันที่:</label>
+        <input type="date" id="attendance-date" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+    </div>
+
+    <!-- เช็คชื่อ -->
+    <table class="w-full border-collapse mb-4">
+        <thead>
+            <tr class="bg-indigo-100 text-indigo-800">
+                <th class="px-4 py-3 text-left">รหัสนักศึกษา</th>
+                <th class="px-4 py-3 text-left">ชื่อ-นามสกุล</th>
+                <th class="px-4 py-3 text-left">สถานะ</th>
+                <th class="px-4 py-3 text-left">บันทึก</th>
+            </tr>
+        </thead>
+        <tbody id="student-list">
+            <!-- Rows will be generated dynamically here -->
+        </tbody>
+    </table>
+
+    <!-- ปุ่ม -->
+    <div class="flex gap-4">
+        <button id="mark-all-present" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">เช็คชื่อทั้งหมด</button>
+        <button id="reset-all" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">ยกเลิกทั้งหมด</button>
+        <button id="save-attendance" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">บันทึกข้อมูล</button>
+    </div>
+
+    <footer class="fixed bottom-0 left-0 p-4 text-sm text-indigo-800">
+        <p>Developer : ครูแฮม</p>
+        <p>© 2025-2026 All Rights Reserved</p>
+    </footer>
+
+    <script>
+        // ข้อมูลนักเรียน
+        const students = [
+            { id: '67202020001', name: 'นางสาวจุฑารัตน์ จันทร' },
+            { id: '67202020002', name: 'นายธันวา ง้วนดิน' },
+            { id: '67202020003', name: 'นางสาวนันทิตา จงมีสุข' },
+            { id: '67202020004', name: 'นางสาวบุณยวีร์ มีแสง' },
+            { id: '67202020006', name: 'นางสาวรติมา เกษมพันธ์' },
+            { id: '67202020007', name: 'นางสาวรุ่งนภา เที่ยงพร' },
+            { id: '67202020039', name: 'นางสาวธนภรณ์ พุ่มรส' },
+            { id: '67202020040', name: 'นายสุทิวัส ก้อนจันทร์' },
+            { id: '67202020041', name: 'นางสาววิชญาดา จันต๊ะกูล' }
+        ];
+
+        // สร้างตารางนักเรียน
+        const studentList = document.getElementById('student-list');
+        students.forEach(student => {
+            const row = document.createElement('tr');
+            row.classList.add('border-b', 'hover:bg-gray-50');
+            row.innerHTML = `
+                <td class="px-4 py-3">${student.id}</td>
+                <td class="px-4 py-3">${student.name}</td>
+                <td class="px-4 py-3">
+                    <button class="status-btn px-3 py-1 rounded-lg bg-green-100 text-green-700" data-status="present" data-student-id="${student.id}">มาเรียน</button>
+                    <button class="status-btn px-3 py-1 rounded-lg bg-red-100 text-red-700" data-status="absent" data-student-id="${student.id}">ขาดเรียน</button>
+                    <button class="status-btn px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700" data-status="leave" data-student-id="${student.id}">ลา</button>
+                </td>
+                <td class="px-4 py-3">
+                    <textarea class="w-full border border-gray-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" rows="1" placeholder="บันทึกพฤติกรรม..." data-note="${student.id}"></textarea>
+                </td>
+            `;
+            studentList.appendChild(row);
+        });
+
+        // เพิ่ม event listener ให้กับปุ่ม
+        document.querySelectorAll('.status-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const studentId = button.dataset.studentId;
+                const status = button.dataset.status;
+                const row = button.closest('tr');
+                
+                // เปลี่ยนสีแถวตามสถานะ
+                row.classList.remove('bg-green-100', 'bg-red-100', 'bg-yellow-100');
+                if (status === 'present') row.classList.add('bg-green-100');
+                if (status === 'absent') row.classList.add('bg-red-100');
+                if (status === 'leave') row.classList.add('bg-yellow-100');
+            });
+        });
+
+        // ปุ่มเช็คชื่อทั้งหมด
+        document.getElementById('mark-all-present').addEventListener('click', () => {
+            document.querySelectorAll('tr').forEach(row => {
+                row.querySelector('.status-btn[data-status="present"]').click();
+            });
+        });
+
+        // ปุ่มยกเลิกทั้งหมด
+        document.getElementById('reset-all').addEventListener('click', () => {
+            document.querySelectorAll('tr').forEach(row => {
+                row.classList.remove('bg-green-100', 'bg-red-100', 'bg-yellow-100');
+                row.querySelectorAll('.status-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+            });
+        });
+
+        // บันทึกข้อมูล
+        document.getElementById('save-attendance').addEventListener('click', () => {
+            const date = document.getElementById('attendance-date').value;
+            if (!date) {
+                alert('กรุณาเลือกวันที่');
+                return;
+            }
+            const attendanceData = [];
+            document.querySelectorAll('tr').forEach(row => {
+                const studentId = row.querySelector('td:first-child').textContent;
+                const statusButton = row.querySelector('.status-btn.active');
+                const note = row.querySelector('textarea').value;
+                const status = statusButton ? statusButton.dataset.status : '';
+                attendanceData.push({
+                    studentId,
+                    status,
+                    note,
+                    date
+                });
+            });
+
+            // ส่งข้อมูลไปยัง Google Sheets ผ่าน Google Apps Script
+            const url = 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL';
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    date: date,
+                    attendanceData: attendanceData
+                })
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert('บันทึกข้อมูลเรียบร้อย');
+            })
+            .catch(error => {
+                alert('เกิดข้อผิดพลาด: ' + error);
+            });
+        });
+    </script>
 </body>
 </html>
