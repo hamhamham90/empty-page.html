@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าเว็ปเปล่า</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-blue-100 min-h-screen flex justify-center items-center">
+    <h1 class="text-2xl font-bold text-indigo-700">ยินดีต้อนรับสู่หน้าเว็ปเปล่า!</h1>
+</body>
+</html>
